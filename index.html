@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Patreon Gallery Scout</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/patreon-gallery-icon.svg" />
+    <link rel="alternate icon" type="image/png" href="/assets/patreon-gallery-icon.png" />
+    <link rel="apple-touch-icon" href="/assets/patreon-gallery-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="rail" aria-label="Membership navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <img src="/assets/patreon-gallery-icon.svg" alt="" />
+          </div>
+          <div>
+            <p class="eyebrow">Patreon</p>
+            <h1>Gallery Scout</h1>
+          </div>
+        </div>
+
+        <section class="panel auth-panel" aria-label="Patreon connection">
+          <div class="panel-title-row">
+            <h2>Patreon account</h2>
+            <span id="apiModeBadge" class="status-pill">Demo</span>
+          </div>
+          <p id="authStatusText" class="panel-note">Run the local server to connect a real Patreon account.</p>
+          <div class="filter-actions">
+            <a id="authAction" class="primary-button" href="/api/v1/auth/login">Connect Patreon</a>
+            <button id="logoutAction" class="ghost-button" type="button" hidden>Log out</button>
+          </div>
+        </section>
+
+        <section class="panel memberships">
+          <div class="panel-title-row">
+            <h2>Memberships</h2>
+            <button id="resetState" class="ghost-button" type="button">Reset viewed</button>
+          </div>
+          <div id="membershipList" class="membership-list"></div>
+        </section>
+
+        <section class="panel filters" aria-label="Filters">
+          <h2>Filters</h2>
+          <label>
+            <span>Search</span>
+            <input id="searchInput" type="search" placeholder="title, body, filename…" autocomplete="off" />
+          </label>
+          <div class="two-up">
+            <label>
+              <span>From</span>
+              <input id="fromDate" type="date" />
+            </label>
+            <label>
+              <span>To</span>
+              <input id="toDate" type="date" />
+            </label>
+          </div>
+          <label>
+            <span>Media type</span>
+            <select id="typeFilter">
+              <option value="all">All media</option>
+              <option value="image">Images</option>
+              <option value="video">Videos</option>
+              <option value="file">Files</option>
+            </select>
+          </label>
+          <label>
+            <span>Viewed</span>
+            <select id="viewedFilter">
+              <option value="all">All posts</option>
+              <option value="unviewed">Unviewed only</option>
+              <option value="viewed">Viewed only</option>
+            </select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select id="sortOrder">
+              <option value="desc">Newest first</option>
+              <option value="asc">Oldest first</option>
+            </select>
+          </label>
+          <div class="filter-actions">
+            <button id="clearFilters" class="secondary-button" type="button">Clear</button>
+            <button id="downloadFiltered" class="primary-button" type="button">Bulk download</button>
+          </div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Responsive subscriber archive</p>
+            <h2 id="activeTitle">Gallery</h2>
+            <p id="activeSubtitle" class="subtitle"></p>
+          </div>
+          <div class="hero-actions">
+            <label class="jump-control">
+              <span>Jump to post</span>
+              <select id="jumpSelect"></select>
+            </label>
+            <button id="continueButton" class="primary-button" type="button">Continue last viewed</button>
+          </div>
+        </header>
+
+        <section class="stats-grid" aria-label="Archive statistics">
+          <article>
+            <strong id="statPosts">0</strong>
+            <span>posts shown</span>
+          </article>
+          <article>
+            <strong id="statAssets">0</strong>
+            <span>assets</span>
+          </article>
+          <article>
+            <strong id="statViewed">0</strong>
+            <span>viewed</span>
+          </article>
+          <article>
+            <strong id="statDateRange">—</strong>
+            <span>date span</span>
+          </article>
+        </section>
+
+        <section id="galleryGrid" class="gallery-grid" aria-live="polite"></section>
+        <p id="emptyState" class="empty-state" hidden>No posts match the current filters.</p>
+      </main>
+    </div>
+
+    <dialog id="postDialog" class="post-dialog" aria-labelledby="dialogTitle">
+      <button id="closeDialog" class="dialog-close" type="button" aria-label="Close post">×</button>
+      <div id="dialogBody"></div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

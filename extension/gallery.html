@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gallery Scout · Subscriber preview</title>
+  <link rel="icon" type="image/png" href="assets/patreon-gallery-icon.png" />
+  <link rel="stylesheet" href="gallery.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo-row">
+        <img src="assets/patreon-gallery-icon.png" alt="" class="logo" />
+        <div><span class="kicker">Your signed-in archive</span><h1>Gallery Scout</h1></div>
+      </div>
+      <section class="sidebar-card">
+        <span class="section-label">Patreon tabs</span>
+        <p class="hint">Open a membership’s Posts page in Patreon, then find it here. If it is not detected, reload that Patreon tab and try again.</p>
+        <button id="findTabs" type="button" class="button button-outline">Find open Patreon tabs</button>
+        <label for="membershipSelect">Choose a feed</label>
+        <select id="membershipSelect" disabled><option value="">Searching…</option></select>
+        <button id="reloadFeed" type="button" class="button button-primary" disabled>Load posts</button>
+      </section>
+      <section class="sidebar-card">
+        <span class="section-label">Refine loaded posts</span>
+        <label for="search">Search title</label>
+        <input id="search" type="search" placeholder="A title or keyword…" />
+        <label for="typeFilter">Media</label>
+        <select id="typeFilter"><option value="all">All kinds</option><option value="image">Images</option><option value="video">Videos</option><option value="file">Files</option><option value="post">Other posts</option></select>
+        <label for="viewFilter">Reading state</label>
+        <select id="viewFilter"><option value="all">All loaded</option><option value="unviewed">Not opened here</option><option value="viewed">Opened here</option></select>
+        <label for="sort">Order</label>
+        <select id="sort"><option value="desc">Newest date first</option><option value="asc">Oldest date first</option></select>
+        <div class="dates"><label for="fromDate">From<input id="fromDate" type="date" /></label><label for="toDate">To<input id="toDate" type="date" /></label></div>
+      </section>
+      <section class="sidebar-card">
+        <span class="section-label">Download your media</span>
+        <label for="downloadScope">Choose posts</label>
+        <select id="downloadScope"><option value="current">Current filters</option><option value="all">All accessible media</option><option value="unread">Not opened here</option><option value="dates">Date range</option></select>
+        <div id="downloadDates" class="dates" hidden><label for="downloadFrom">From<input id="downloadFrom" type="date" /></label><label for="downloadTo">To<input id="downloadTo" type="date" /></label></div>
+        <button id="prepareDownloads" type="button" class="button button-outline" disabled>Prepare downloads</button>
+        <p id="downloadProgress" class="hint download-progress" role="status" aria-live="polite">Only files Patreon provides to your account can be downloaded.</p>
+        <button id="cancelDownloads" type="button" class="button button-outline" hidden>Stop queueing</button>
+        <button id="exportYoutubeUrls" type="button" class="button button-outline" disabled>Export YouTube URLs for yt-dlp</button>
+        <p id="youtubeExportStatus" class="hint download-progress" role="status" aria-live="polite">Creates a plain-text list, not a video download.</p>
+        <button id="cancelYoutubeExport" type="button" class="button button-outline" hidden>Stop export</button>
+      </section>
+      <p class="sidebar-foot">“Unread” means not opened in Gallery Scout on this browser profile; it does not reflect Patreon's read state. Reads pages using your Patreon tab. It never asks for your password or copy session cookies to a local server.</p>
+    </aside>
+    <main class="main">
+      <header class="hero">
+        <div><span class="kicker">A calmer way to browse</span><h2 id="heading">Your posts,<br /><em>at a glance.</em></h2><p id="subtitle">Choose a Patreon tab to start exploring posts you can view.</p></div>
+        <div class="hero-tools"><span id="connectionBadge" class="badge">Waiting for a tab</span><button id="startOldestPost" type="button" class="button button-primary gallery-start" disabled>Load oldest post ↓</button><button id="startOldestUnreadPost" type="button" class="button button-outline gallery-start" disabled>Load oldest unread post ↓</button><button id="openGallery" type="button" class="button button-outline gallery-start" disabled>Media viewer · oldest unread →</button><p class="hero-start-hint">Post starts scan the archive, clear post filters and sort cards oldest first. The media viewer browses images, videos and files.</p><label for="jump">Jump to a loaded post</label><select id="jump" disabled><option value="">No posts yet</option></select></div>
+      </header>
+      <section class="metrics" aria-label="Loaded post statistics"><div><strong id="shownCount">0</strong><span>shown</span></div><div><strong id="loadedCount">0</strong><span>loaded</span></div><div><strong id="viewedCount">0</strong><span>opened</span></div></section>
+      <p id="status" class="status" role="status" aria-live="polite">Looking for signed-in Patreon tabs…</p>
+      <section id="grid" class="grid" aria-label="Post gallery"></section>
+      <div class="more-row"><button id="loadMore" type="button" class="button button-primary" hidden>Load next page</button></div>
+    </main>
+  </div>
+  <dialog id="viewer" class="viewer" aria-labelledby="viewerTitle" aria-describedby="viewerHint">
+    <div class="viewer-shell">
+      <header class="viewer-header">
+        <div class="viewer-heading"><span class="kicker">Media gallery</span><h2 id="viewerTitle">Post media</h2><p id="viewerCounter"></p></div>
+        <div class="viewer-actions">
+          <button id="viewerZoom" type="button" class="viewer-button" aria-pressed="false">Zoom to 100%</button>
+          <button id="viewerDownload" type="button" class="viewer-button" disabled>Download post ↓</button>
+          <button id="viewerOriginal" type="button" class="viewer-button">Original post ↗</button>
+          <button id="viewerClose" type="button" class="viewer-button viewer-close" aria-label="Close media viewer">×</button>
+        </div>
+      </header>
+      <div class="viewer-jumpbar">
+        <label for="viewerJump">Jump to</label>
+        <select id="viewerJump"><option value="oldest-unread">Oldest unread</option><option value="oldest">Oldest</option><option value="newest-unread">Newest unread</option><option value="newest">Newest</option><option value="date">A date…</option></select>
+        <input id="viewerDate" type="date" aria-label="Jump to post on or after date" hidden />
+        <button id="viewerGo" type="button" class="viewer-button">Go</button>
+        <button id="viewerCancelScan" type="button" class="viewer-button" hidden>Stop scanning</button>
+        <span>← older · newer →</span>
+      </div>
+      <div class="viewer-stage-row">
+        <button id="viewerPrev" type="button" class="viewer-arrow" aria-label="Previous older post">←</button>
+        <div id="viewerStage" class="viewer-stage"><img id="viewerImage" alt="" referrerpolicy="no-referrer" /><video id="viewerVideo" controls playsinline preload="metadata" hidden></video><iframe id="viewerEmbed" title="Embedded video" sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="no-referrer" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" hidden></iframe><div id="viewerFallback" class="viewer-fallback" hidden></div><button id="viewerMediaLink" type="button" class="viewer-media-link" hidden><span>Open media ↗</span></button><button id="viewerEmbedStart" type="button" class="viewer-embed-start" hidden>▶ Play here</button></div>
+        <button id="viewerNext" type="button" class="viewer-arrow" aria-label="Next newer post">→</button>
+      </div>
+      <div id="viewerAssets" class="viewer-assets" hidden aria-label="Available post media"></div>
+      <p id="viewerLoading" class="viewer-loading" role="status"></p>
+      <footer class="viewer-footer"><p id="viewerDescription"></p><span id="viewerHint">← older · → newer · Escape closes · Zoom for original pixels</span></footer>
+    </div>
+  </dialog>
+  <dialog id="scanDialog" class="scan-dialog" aria-labelledby="scanTitle" aria-describedby="scanProgress">
+    <span class="kicker">Your archive</span><h2 id="scanTitle">Finding your starting point…</h2>
+    <p id="scanProgress" role="status" aria-live="polite">Checking pages for the oldest unread media post.</p>
+    <button id="scanCancel" type="button" class="button button-outline">Stop scanning</button>
+  </dialog>
+  <dialog id="downloadConfirm" class="scan-dialog" aria-labelledby="downloadConfirmTitle" aria-describedby="downloadConfirmText">
+    <span class="kicker">Before downloading</span><h2 id="downloadConfirmTitle">Download selected media?</h2>
+    <p id="downloadConfirmText"></p>
+    <div class="confirm-actions"><button id="confirmDownloads" type="button" class="button button-primary">Start downloads</button><button id="dismissDownloads" type="button" class="button button-outline">Cancel</button></div>
+  </dialog>
+  <script src="navigation.js"></script>
+  <script src="downloads.js"></script>
+  <script src="file-icons.js"></script>
+  <script src="gallery.js"></script>
+</body>
+</html>
