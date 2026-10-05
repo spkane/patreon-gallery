@@ -105,7 +105,9 @@
     return { detail };
   }
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Only our background worker brokers requests; reject tab/external contexts.
+    if (sender.id !== chrome.runtime.id || sender.tab) return;
     if (message?.action === 'DISCOVER_FEEDS') {
       findFeeds().then((feeds) => sendResponse({ feeds }),
         (error) => sendResponse({ error: error.message || 'Could not find a campaign on this tab.' }));

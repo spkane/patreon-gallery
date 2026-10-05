@@ -118,40 +118,40 @@ test('unresolved link posts remain candidates for a YouTube URL export', () => {
 });
 
 test('a viewable text post exposes both distinct YouTube links from its body without turning into a video post', () => {
-  const attrs = { current_user_can_view: true, post_type: 'text_only', title: 'FreeCAD 26.3',
+  const attrs = { current_user_can_view: true, post_type: 'text_only', title: 'Two tutorials',
     content_json_string: JSON.stringify({ type: 'doc', content: [
-      { type: 'paragraph', content: [{ type: 'text', text: 'Sketcher: https://youtu.be/ZFP_cWbhcwA' }] },
-      { type: 'paragraph', content: [{ type: 'text', text: 'External geometry: https://youtu.be/7JzapY5aFvg' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'Tutorial: https://youtu.be/AbCdEfGhI12' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'Second tutorial: https://youtu.be/MnOpQrStU34' }] },
     ] }),
   };
-  const post = feed.normalizePage({ data: [{ id: '170565470', type: 'post', attributes: attrs }] })[0];
+  const post = feed.normalizePage({ data: [{ id: '80', type: 'post', attributes: attrs }] })[0];
   assert.equal(post.type, 'post');
   assert.deepEqual(Array.from(post.youtubeWatchUrls), [
-    'https://www.youtube.com/watch?v=ZFP_cWbhcwA',
-    'https://www.youtube.com/watch?v=7JzapY5aFvg',
+    'https://www.youtube.com/watch?v=AbCdEfGhI12',
+    'https://www.youtube.com/watch?v=MnOpQrStU34',
   ]);
-  const detail = feed.normalizeDetail({ data: { id: '170565470', type: 'post', attributes: attrs } }, '170565470');
+  const detail = feed.normalizeDetail({ data: { id: '80', type: 'post', attributes: attrs } }, '80');
   assert.deepEqual(Array.from(detail.youtubeWatchUrls), Array.from(post.youtubeWatchUrls));
 });
 
 test('a thumbnail on a text-only post does not turn its card into an image viewer', () => {
-  const post = feed.normalizePage({ data: [{ type: 'post', id: '170565470', attributes: {
+  const post = feed.normalizePage({ data: [{ type: 'post', id: '80', attributes: {
     current_user_can_view: true, post_type: 'text_only',
     image: { large_url: 'https://c10.patreonusercontent.com/preview.jpg' },
-    content_teaser_text: 'Watch https://youtu.be/ZFP_cWbhcwA',
+    content_teaser_text: 'Watch https://youtu.be/AbCdEfGhI12',
   } }] })[0];
   assert.equal(post.type, 'post');
   assert.equal(post.previewUrl, 'https://c10.patreonusercontent.com/preview.jpg');
-  assert.deepEqual(Array.from(post.youtubeWatchUrls), ['https://www.youtube.com/watch?v=ZFP_cWbhcwA']);
+  assert.deepEqual(Array.from(post.youtubeWatchUrls), ['https://www.youtube.com/watch?v=AbCdEfGhI12']);
 });
 
 test('body hyperlinks, HTML links, and teaser duplicates export only canonical authorized YouTube URLs', () => {
   const attrs = { current_user_can_view: true, post_type: 'text_only',
-    content_teaser_text: 'https://youtu.be/ZFP_cWbhcwA',
-    content: '<a href="https://www.youtube.com/watch?v=7JzapY5aFvg&amp;feature=share">Watch</a> https://www.youtube.com.evil.example/watch?v=AbCdEfGhI12',
+    content_teaser_text: 'https://youtu.be/AbCdEfGhI12',
+    content: '<a href="https://www.youtube.com/watch?v=MnOpQrStU34&amp;feature=share">Watch</a> https://www.youtube.com.evil.example/watch?v=AbCdEfGhI12',
     content_json_string: JSON.stringify({ type: 'doc', content: [{ type: 'paragraph', content: [
-      { type: 'text', text: 'Video one', marks: [{ type: 'link', attrs: { href: 'https://youtu.be/ZFP_cWbhcwA' } }] },
-      { type: 'text', text: 'Video two', marks: [{ type: 'link', attrs: { href: 'https://youtu.be/7JzapY5aFvg' } }] },
+      { type: 'text', text: 'Video one', marks: [{ type: 'link', attrs: { href: 'https://youtu.be/AbCdEfGhI12' } }] },
+      { type: 'text', text: 'Video two', marks: [{ type: 'link', attrs: { href: 'https://youtu.be/MnOpQrStU34' } }] },
     ] }] }),
   };
   const page = feed.normalizePage({ data: [
@@ -160,7 +160,7 @@ test('body hyperlinks, HTML links, and teaser duplicates export only canonical a
   ] });
   assert.equal(page.length, 1);
   assert.deepEqual(Array.from(page[0].youtubeWatchUrls), [
-    'https://www.youtube.com/watch?v=ZFP_cWbhcwA', 'https://www.youtube.com/watch?v=7JzapY5aFvg',
+    'https://www.youtube.com/watch?v=AbCdEfGhI12', 'https://www.youtube.com/watch?v=MnOpQrStU34',
   ]);
   assert.equal(feed.normalizeDetail({ data: { type: 'post', id: '82', attributes: { ...attrs, current_user_can_view: false } } }, '82'), null);
 });

@@ -14,6 +14,7 @@ test('repairs a Patreon tab after extension reload by injecting bundled content 
   const shown = [];
   let downloadState = 'complete';
   let rejectNativeOpen = false;
+  let rejectTabOpen = false;
   let messages = 0;
   const sandbox = { URL, chrome: {
     runtime: {
@@ -22,7 +23,10 @@ test('repairs a Patreon tab after extension reload by injecting bundled content 
     },
     action: { onClicked: { addListener: (listener) => { onClick = listener; } } },
     tabs: {
-      create: async (options) => { opened.push(options.url); },
+      create: async (options) => {
+        if (rejectTabOpen) throw new Error('failed https://c10.patreonusercontent.com/manual.pdf?signature=private');
+        opened.push(options.url);
+      },
       query: async () => [{ id: 17, url: 'https://www.patreon.com/c/Creator/posts', title: 'Creator Posts' }],
       sendMessage: async () => {
         messages++;
@@ -86,8 +90,17 @@ test('repairs a Patreon tab after extension reload by injecting bundled content 
   assert.equal((await queue({ action: 'OPEN_DOWNLOADED', downloadId: 42 })).shown, true);
   assert.deepEqual(shown, [42]);
   assert.equal(downloads.length, 2);
+  rejectTabOpen = true;
+  const failedOpen = await queue({ action: 'OPEN_ASSET', url: 'https://c10.patreonusercontent.com/manual.pdf',
+    filename: 'Gallery Scout/15105167/manual.pdf' });
+  assert.match(failedOpen.error, /could not complete/i);
+  assert.equal(failedOpen.error.includes('signature'), false);
+  assert.equal(failedOpen.error.includes('patreonusercontent'), false);
   const unauthorized = onMessage({ action: 'DOWNLOAD_ASSET', url: 'https://c10.patreonusercontent.com/strip.jpg', filename: 'Gallery Scout/15105167/strip.jpg' },
     { id: 'website', url: 'https://www.patreon.com/' }, () => {});
+  for (const url of ['chrome-extension://our-extension/gallery.html-other', 'https://www.patreon.com/gallery.html']) {
+    assert.equal(onMessage({ action: 'LIST_TABS' }, { id: 'our-extension', url }, () => {}), undefined);
+  }
   assert.equal(unauthorized, undefined);
   assert.equal(downloads.length, 2);
 });

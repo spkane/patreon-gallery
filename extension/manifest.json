@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gallery Scout for Patreon",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Browse posts already available in your signed-in Patreon tab. No cookies leave Chrome.",
   "icons": {
     "128": "assets/patreon-gallery-icon.png"

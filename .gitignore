@@ -1,5 +1,12 @@
 .env
+.env.*
+!.env.example
 __pycache__/
 *.pyc
 .DS_Store
-.gsd
+.gsd/
+.audit-tmp/
+dist/
+gallery-scout-chrome-extension.zip
+extension/.*-smoke.html
+extension/.*-qa.png

@@ -11,7 +11,7 @@ function createContentScript(responses, options = {}) {
     URL, URLSearchParams, AbortController, setTimeout, clearTimeout,
     location: { pathname: options.pathname || '/c/Creator/posts' },
     performance: { getEntriesByType: () => options.resources ?? [{ name: 'https://www.patreon.com/api/campaigns/15105167/posts?page%5Bcursor%5D=null&page%5Bcount%5D=6' }] },
-    chrome: { runtime: { onMessage: { addListener: (fn) => { listener = fn; } } } },
+    chrome: { runtime: { id: 'our-extension', onMessage: { addListener: (fn) => { listener = fn; } } } },
     fetch: async (url, options) => {
       urls.push({ url, options });
       return { ok: true, json: async () => responses.shift() };
@@ -21,10 +21,17 @@ function createContentScript(responses, options = {}) {
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../extension', file), 'utf8'), sandbox);
   }
   function message(request) {
-    return new Promise((resolve) => listener(request, {}, resolve));
+    return new Promise((resolve) => listener(request, { id: 'our-extension' }, resolve));
   }
-  return { message, urls };
+  return { message, urls, rejectedMessage: (sender) => listener({ action: 'DISCOVER_FEEDS' }, sender, () => { throw new Error('unexpected reply'); }) };
 }
+
+test('content script ignores external and tab senders without making requests', () => {
+  const { rejectedMessage, urls } = createContentScript([]);
+  assert.equal(rejectedMessage({ id: 'another-extension' }), undefined);
+  assert.equal(rejectedMessage({ id: 'our-extension', tab: { id: 1 } }), undefined);
+  assert.equal(urls.length, 0);
+});
 
 test('content script follows only its campaign feed cursor and returns viewable posts', async () => {
   const next = 'https://www.patreon.com/api/posts?filter%5Bcampaign_id%5D=15105167&page%5Bcursor%5D=second';

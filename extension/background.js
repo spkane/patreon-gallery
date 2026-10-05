@@ -25,8 +25,19 @@ chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.create({ url: gallery.href });
 });
 
+class GalleryError extends Error {}
+
+function isGallerySender(sender) {
+  if (sender.id !== chrome.runtime.id) return false;
+  try {
+    const actual = new URL(sender.url);
+    const expected = new URL(chrome.runtime.getURL('gallery.html'));
+    return actual.protocol === expected.protocol && actual.host === expected.host && actual.pathname === expected.pathname;
+  } catch { return false; }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL('gallery.html'))) return;
+  if (!isGallerySender(sender)) return;
 
   async function forward() {
     if (message?.action === 'LIST_TABS') {
@@ -53,9 +64,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return { tabs: results };
     }
     if (message?.action === 'OPEN_DOWNLOADED') {
-      if (!Number.isInteger(message.downloadId) || message.downloadId < 0) throw new Error('Invalid download.');
+      if (!Number.isInteger(message.downloadId) || message.downloadId < 0) throw new GalleryError('Invalid download.');
       const [item] = await chrome.downloads.search({ id: message.downloadId });
-      if (!item || item.byExtensionId !== chrome.runtime.id) throw new Error('Download not created by Gallery Scout.');
+      if (!item || item.byExtensionId !== chrome.runtime.id) throw new GalleryError('Download not created by Gallery Scout.');
       if (item.state !== 'complete') return { pending: true };
       try {
         await chrome.downloads.open(item.id);
@@ -68,8 +79,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     if (message?.action === 'DOWNLOAD_ASSET' || message?.action === 'OPEN_ASSET') {
       const url = safeDownloadUrl(message.url);
-      if (!url) throw new Error('This media URL cannot be downloaded safely. Open the original post instead.');
-      if (!safeFilename(message.filename)) throw new Error('Invalid download filename.');
+      if (!url) throw new GalleryError('This media URL cannot be downloaded safely. Open the original post instead.');
+      if (!safeFilename(message.filename)) throw new GalleryError('Invalid download filename.');
       const viewable = /\.(?:pdf|txt|md|json|csv|jpg|jpeg|png|gif|webp|bmp|avif|mp3|wav|ogg|mp4|webm)$/i.test(message.filename);
       if (message.action === 'OPEN_ASSET' && viewable) {
         await chrome.tabs.create({ url });
@@ -82,17 +93,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return message.action === 'OPEN_ASSET' ? { downloadId, requiresOpen: true } : { downloadId };
       } catch {
         // Chrome error details can contain signed URLs; never return them to the gallery.
-        throw new Error('Chrome could not queue this download. Check Downloads or open the post on Patreon.');
+        throw new GalleryError('Chrome could not queue this download. Check Downloads or open the post on Patreon.');
       }
     }
     if (message?.action === 'LOAD_PAGE' || message?.action === 'LOAD_DETAIL') {
       if (!Number.isInteger(message.tabId) || !/^\d+$/.test(String(message.campaignId))) {
-        throw new Error('Invalid tab or campaign.');
+        throw new GalleryError('Invalid tab or campaign.');
       }
       const tab = await chrome.tabs.get(message.tabId);
-      if (!tab.url?.startsWith('https://www.patreon.com/')) throw new Error('Open a Patreon tab before loading posts.');
+      if (!tab.url?.startsWith('https://www.patreon.com/')) throw new GalleryError('Open a Patreon tab before loading posts.');
       if (message.action === 'LOAD_DETAIL') {
-        if (!/^\d+$/.test(String(message.postId))) throw new Error('Invalid post ID.');
+        if (!/^\d+$/.test(String(message.postId))) throw new GalleryError('Invalid post ID.');
         return chrome.tabs.sendMessage(message.tabId, {
           action: 'LOAD_DETAIL', campaignId: String(message.campaignId), postId: String(message.postId),
         });
@@ -101,9 +112,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         action: 'LOAD_PAGE', campaignId: String(message.campaignId), reset: message.reset === true,
       });
     }
-    throw new Error('Unsupported gallery action.');
+    throw new GalleryError('Unsupported gallery action.');
   }
 
-  forward().then(sendResponse, (error) => sendResponse({ error: error.message || 'Could not reach Patreon tab.' }));
+  forward().then(sendResponse, (error) => sendResponse({
+    error: error instanceof GalleryError ? error.message : 'Chrome could not complete this action. Reload the Patreon tab and try again.',
+  }));
   return true;
 });

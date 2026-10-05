@@ -37,7 +37,8 @@ class PostsApiTests(unittest.TestCase):
             with urllib.request.urlopen(request, timeout=3) as response:
                 return response.status, json.load(response)
         except urllib.error.HTTPError as error:
-            return error.code, json.load(error)
+            with error:
+                return error.code, json.load(error)
 
     def test_subscriber_posts_request_uses_valid_fields_and_returns_next_cursor(self):
         def fake_patreon_request(method, url, token=None, data=None):
