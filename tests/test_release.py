@@ -38,6 +38,17 @@ class SiteTests(unittest.TestCase):
             if file.is_file():
                 self.assertIn(file.suffix, ['.html', '.css'])
 
+    def test_readme_screenshots_are_present(self):
+        import re
+        readme = (ROOT / 'README.md').read_text()
+        images = re.findall(r'!\[[^\]]+\]\((docs/screenshots/[^)]+)\)', readme)
+        self.assertEqual(len(images), 4)
+        for name in images:
+            self.assertEqual((ROOT / name).read_bytes()[:8], b'\x89PNG\r\n\x1a\n', name)
+        self.assertIn('synthetic posts', readme)
+        self.assertIn('manifest.json', readme)
+        self.assertIn('Code → Download ZIP', readme)
+
     def test_release_docs_exist(self):
         for name in ['LICENSE', 'NOTICE', 'SECURITY.md', 'CHANGELOG.md',
                      'docs/PRIVACY.md', 'docs/ACCESS-RISKS.md', 'docs/RELEASE.md', 'docs/SECURITY-AUDIT.md']:
