@@ -1,6 +1,8 @@
 """Public-site and documentation invariants; no network access or dependencies."""
 from html.parser import HTMLParser
 from pathlib import Path
+import shutil
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,14 +31,21 @@ class SiteTests(unittest.TestCase):
         page.feed((ROOT / 'site/index.html').read_text())
         self.assertNotIn('script', page.tags)
         self.assertNotIn('form', page.tags)
-        for url in page.urls:
-            if url.startswith('#'):
-                self.assertIn(url[1:], page.ids)
-            elif not url.startswith('https://'):
-                self.assertTrue((ROOT / 'site' / url).exists(), url)
-        for file in (ROOT / 'site').rglob('*'):
-            if file.is_file():
-                self.assertIn(file.suffix, ['.html', '.css'])
+        # Pages includes the same screenshot assets used by the README.
+        with tempfile.TemporaryDirectory() as directory:
+            site = Path(directory) / 'site'
+            shutil.copytree(ROOT / 'site', site)
+            shutil.copytree(ROOT / 'docs/screenshots', site / 'screenshots', dirs_exist_ok=True)
+            for url in page.urls:
+                if url.startswith('#'):
+                    self.assertIn(url[1:], page.ids)
+                elif not url.startswith('https://'):
+                    self.assertTrue((site / url).exists(), url)
+            for file in site.rglob('*'):
+                if file.is_file():
+                    self.assertIn(file.suffix, ['.html', '.css', '.png'])
+                    if file.suffix == '.png':
+                        self.assertEqual(file.read_bytes()[:8], b'\x89PNG\r\n\x1a\n', str(file))
 
     def test_readme_screenshots_are_present(self):
         import re
