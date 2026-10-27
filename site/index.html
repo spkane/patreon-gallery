@@ -3,16 +3,47 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Gallery Scout is an unofficial local Chrome extension for browsing posts available through your Patreon memberships.">
+  <meta name="description" content="Turn your Patreon memberships into a browsable image, video and file gallery. Explore creator archives chronologically and pick up at your oldest unread post with Gallery Scout.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Gallery Scout — Your archive, in order</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <header class="masthead"><a class="brand" href="./">Gallery Scout<span>for Patreon · unofficial</span></a><nav aria-label="Main"><a href="#install">Install</a><a href="https://github.com/spkane/patreon-gallery">Source ↗</a></nav></header>
+  <header class="masthead"><a class="brand" href="./">Gallery Scout<span>for Patreon · unofficial</span></a><nav aria-label="Main"><a href="#tour">See the gallery</a><a href="#install">Install</a><a href="https://github.com/spkane/patreon-gallery">Source ↗</a></nav></header>
   <main id="main">
-    <section class="hero"><div><p class="eyebrow">A little order for a big archive</p><h1>Your archive.<br><em>Your pace.</em></h1><p class="lede">Browse the posts you can already access through your Patreon memberships. Start at the beginning, catch up on the unread, and keep the good stuff in view.</p><a class="button" href="#install">Get started ↓</a><p class="fine">Experimental beta · Desktop Chrome · No Web Store install</p></div><aside class="fieldnotes" aria-label="Feature overview"><p class="eyebrow">Scout's field notes</p><ol><li><strong>Start at the oldest</strong><span>All post types, including the ones that are just words.</span></li><li><strong>Move through media</strong><span>Older to the left. Newer to the right. No guessing.</span></li><li><strong>Keep it local</strong><span>Your signed-in tab. Your browser profile. No maintainer account service.</span></li></ol><p class="stamp">Unofficial &amp; open source</p></aside></section>
+    <section class="hero"><div><p class="eyebrow">A little order for a big archive</p><h1>Your archive.<br><em>Your pace.</em></h1><p class="lede">Turn a creator’s Patreon archive into an image, video and file gallery. Gallery Scout is a local Chrome extension that helps you browse posts you can already access through your memberships, start at the oldest post, and pick up at your oldest unread post.</p><a class="button" href="#install">Get started ↓</a><p class="fine">Experimental beta · Desktop Chrome · No Web Store install</p></div><aside class="fieldnotes" aria-label="Feature overview"><p class="eyebrow">Scout's field notes</p><ol><li><strong>Start at the oldest</strong><span>All post types, including the ones that are just words.</span></li><li><strong>Move through media</strong><span>Older to the left. Newer to the right. No guessing.</span></li><li><strong>Keep it local</strong><span>Your signed-in tab. Your browser profile. No maintainer account service.</span></li></ol><p class="stamp">Unofficial &amp; open source</p></aside></section>
+    <section id="tour" class="section tour" aria-labelledby="tour-title">
+      <p class="eyebrow">A look inside Gallery Scout</p>
+      <h2 id="tour-title">Less scrolling.<br>More of the archive.</h2>
+      <div class="overview">
+        <div class="bodycopy">
+          <p>A long-running membership can mean years of posts, images, videos and attachments to work through. Gallery Scout gives that archive a visual index, so you can find a starting point and browse at your own pace.</p>
+          <p>Open a creator’s Posts page in your signed-in Patreon tab, then launch the extension in a separate gallery tab. Filter loaded posts by title, media type, reading state or date, and choose newest-first or oldest-first order.</p>
+          <p>Start at the oldest post or oldest unread post, then move through images, videos and files chronologically. Opened markers are kept locally in your browser so you can see what you have already opened.</p>
+          <a class="button" href="#install">Set up Gallery Scout ↓</a>
+        </div>
+        <figure class="screenshot overview-shot">
+          <a href="screenshots/main-gallery.png" aria-label="View full-size main gallery screenshot"><img src="screenshots/main-gallery.png" width="1440" height="2022" alt="Gallery Scout main gallery with a membership selector, title and media filters, oldest-post controls, and cards for images, video, files and text posts." decoding="async"></a>
+          <figcaption><strong>The archive at a glance.</strong> Filter posts, choose where to start, and open a media card to explore. <a href="screenshots/main-gallery.png">View full-size screenshot ↗</a></figcaption>
+        </figure>
+      </div>
+      <div class="viewer-grid">
+        <figure class="screenshot">
+          <a href="screenshots/image-viewer.png" aria-label="View full-size image viewer screenshot"><img src="screenshots/image-viewer.png" width="1440" height="1180" alt="Image viewer displaying NASA’s Apollo 17 Earth photograph with zoom, older and newer arrows, and Open and Download controls." loading="lazy" decoding="async"></a>
+          <figcaption><h3>Browse images</h3><p>Open an image for a larger view, zoom in, and move to older or newer media without returning to the post list.</p><a href="screenshots/image-viewer.png">View full-size screenshot ↗</a></figcaption>
+        </figure>
+        <figure class="screenshot">
+          <a href="screenshots/video-viewer.png" aria-label="View full-size video viewer screenshot"><img src="screenshots/video-viewer.png" width="1440" height="1180" alt="Video viewer showing an Earth animation in a player with playback controls, a timeline and fullscreen control." loading="lazy" decoding="async"></a>
+          <figcaption><h3>Watch videos</h3><p>Play supported videos in the viewer, seek through the timeline, or go fullscreen. Playback depends on the format and available URL; YouTube opens watch links, and Vimeo uses click-to-load embeds.</p><a href="screenshots/video-viewer.png">View full-size screenshot ↗</a></figcaption>
+        </figure>
+        <figure class="screenshot">
+          <a href="screenshots/file-viewer.png" aria-label="View full-size file viewer screenshot"><img src="screenshots/file-viewer.png" width="1440" height="1180" alt="File viewer listing PDF and ZIP attachments with full filenames, file-type icons, and separate Open and Download buttons." loading="lazy" decoding="async"></a>
+          <figcaption><h3>Find attached files</h3><p>See attachment names and file types together, then choose the file you want to open or download. Browser-supported formats can open in a tab; other formats may download first.</p><a href="screenshots/file-viewer.png">View full-size screenshot ↗</a></figcaption>
+        </figure>
+      </div>
+      <p class="fine screenshot-note">These screenshots show the real extension with synthetic example posts, not paid creator content or a live Patreon session. Earth photograph: NASA / Apollo 17 crew; the example video is an animation of that photograph. <a href="https://github.com/spkane/patreon-gallery/blob/main/docs/examples/README.md">Example media credits ↗</a></p>
+    </section>
     <section class="caution"><h2>Access is not a download license.</h2><p>This tool uses undocumented Patreon website APIs. It is not endorsed by Patreon and may stop working. Save only content you are permitted to save; do not bypass restrictions or redistribute creator media.</p><a href="https://github.com/spkane/patreon-gallery/blob/main/docs/ACCESS-RISKS.md">Read the access &amp; distribution risks ↗</a></section>
     <section id="install" class="section"><p class="eyebrow">01 / Set up your scout</p><h2>A local install.<br>No password handoff.</h2><ol class="steps"><li><h3>Get the files</h3><p>Clone or download the <a href="https://github.com/spkane/patreon-gallery">source repository</a> and keep its <code>extension</code> folder. If a packaged beta is available, use <a href="https://github.com/spkane/patreon-gallery/releases">GitHub Releases</a> and extract it.</p></li><li><h3>Load in Chrome</h3><p>Visit <code>chrome://extensions</code>, turn on Developer mode, choose Load unpacked, and select the folder containing <code>manifest.json</code>. Review the permissions.</p></li><li><h3>Open your membership</h3><p>Sign into Patreon normally, open a creator's Posts page, then click Gallery Scout. Choose a detected feed and load its posts.</p></li></ol></section>
     <section class="section two-column"><div><p class="eyebrow">02 / Find your starting point</p><h2>From the beginning.<br>Or where you left off.</h2></div><div class="bodycopy"><p><strong>Load oldest post</strong> and <strong>Load oldest unread post</strong> scan the archive, clear filters and sort cards oldest-first. Opened markers stay in this browser profile—not Patreon's read state.</p><p>The media viewer browses images, videos and files. Text cards open the original post. Scans are cancellable and capped at 100 pages, so very large archives may be incomplete.</p><p><strong>Download saves; Open views.</strong> Native formats may need a download followed by a second click. Check Chrome Downloads for completion. YouTube actions export URL lists for a separately installed tool; they do not download video files.</p><a href="https://github.com/spkane/patreon-gallery#browse">Full usage &amp; troubleshooting ↗</a></div></section>
