@@ -137,7 +137,17 @@ python3 scripts/package.py
 
 The package appears under `dist/`, with `manifest.json` at root and only allowlisted extension files plus license notices. ZIP generation is reproducible; binaries, caches and secrets are not source-tracked. Load source directly for local iteration.
 
-The static project site is in `site/`; preview with `python3 -m http.server 8080 --directory site --bind 127.0.0.1`. The Pages workflow deploys only that directory. To publish later, push the reviewed commit and enable **Settings → Pages → Source: GitHub Actions**. This preparation does not activate Pages or create a public release.
+The static project site is in `site/`. To preview it locally with the same screenshots included by the Pages workflow, run from the repository root:
+
+```sh
+mkdir -p site/screenshots
+cp docs/screenshots/*.png site/screenshots/
+python3 -m http.server 8080 --directory site --bind 127.0.0.1
+```
+
+Open http://127.0.0.1:8080 in your browser. The copies in `site/screenshots/` are generated preview assets; keep the source images in `docs/screenshots/`.
+
+The Pages workflow copies those screenshots into `site/` before deploying that directory. Changes to the site, screenshot sources or Pages workflow on `main` trigger deployment. Repository setup requires **Settings → Pages → Source: GitHub Actions**. Publishing the project site does not create an extension release.
 
 ### Refresh the documentation screenshots (optional)
 
